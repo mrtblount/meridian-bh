@@ -25,36 +25,39 @@ export default function LinkedinSection() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">
+        <h2 className="text-base font-semibold text-zinc-900">
           LinkedIn Content Drafts
         </h2>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-zinc-400 mt-0.5">
           AI-generated posts for your referral network audience
         </p>
       </div>
 
       <LinkedinForm />
 
-      <div className="flex gap-2">
+      <div className="flex gap-1 border-b border-zinc-100">
         {(["all", "draft", "approved", "rejected"] as const).map((status) => (
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-3 py-1.5 text-sm rounded-lg font-medium transition-colors ${
+            className={`px-3 py-2 text-sm font-medium transition-colors relative ${
               filter === status
-                ? "bg-[#1e3a5f] text-white"
-                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+                ? "text-zinc-900"
+                : "text-zinc-400 hover:text-zinc-600"
             }`}
           >
             {status.charAt(0).toUpperCase() + status.slice(1)}
-            <span className="ml-1.5 text-xs opacity-70">({counts[status]})</span>
+            <span className="ml-1 text-xs opacity-60">{counts[status]}</span>
+            {filter === status && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 rounded-full" />
+            )}
           </button>
         ))}
       </div>
 
       {filteredDrafts.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
-          <p className="text-slate-500">
+        <div className="bg-white rounded-xl border border-zinc-100 p-12 text-center">
+          <p className="text-zinc-400 text-sm">
             {filter === "all"
               ? "No drafts yet. Generate your first LinkedIn post above."
               : `No ${filter} drafts.`}
