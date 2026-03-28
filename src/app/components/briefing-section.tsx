@@ -2,25 +2,37 @@
 
 import { useQuery, useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Loader2 } from "lucide-react";
 import BriefingCard from "./briefing-card";
 
 export default function BriefingSection() {
-  const latest = useQuery(api.queries.briefings.getLatest);
-  const history = useQuery(api.queries.briefings.list);
+  const briefings = useQuery(api.queries.briefings.list);
   const generateBriefing = useAction(api.actions.generateBriefing.generateBriefing);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Auto-expand the most recent briefing
+  useEffect(() => {
+    if (briefings && briefings.length > 0 && expandedId === null) {
+      setExpandedId(briefings[0]._id);
+    }
+  }, [briefings, expandedId]);
 
   async function handleGenerate() {
     setIsGenerating(true);
     try {
       await generateBriefing();
+      setExpandedId(null); // Reset so useEffect picks up the new one
     } catch (err) {
       console.error("Failed to generate briefing:", err);
     } finally {
       setIsGenerating(false);
     }
+  }
+
+  function handleToggle(id: string) {
+    setExpandedId(id);
   }
 
   return (
@@ -48,9 +60,7 @@ export default function BriefingSection() {
         </button>
       </div>
 
-      {latest ? (
-        <BriefingCard briefing={latest} featured />
-      ) : (
+      {!briefings || briefings.length === 0 ? (
         <div className="bg-pop rounded-lg p-1.5">
           <div className="bg-card rounded p-12 text-center">
             <p className="text-sm text-muted-foreground">
@@ -58,18 +68,16 @@ export default function BriefingSection() {
             </p>
           </div>
         </div>
-      )}
-
-      {history && history.length > 1 && (
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">
-            Previous Briefings
-          </p>
-          <div className="space-y-3">
-            {history.slice(1, 4).map((briefing) => (
-              <BriefingCard key={briefing._id} briefing={briefing} />
-            ))}
-          </div>
+      ) : (
+        <div className="space-y-3">
+          {briefings.map((briefing) => (
+            <BriefingCard
+              key={briefing._id}
+              briefing={briefing}
+              expanded={expandedId === briefing._id}
+              onSelect={() => handleToggle(briefing._id)}
+            />
+          ))}
         </div>
       )}
     </div>

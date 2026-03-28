@@ -1,7 +1,7 @@
 "use client";
 
 import { Doc } from "../../../convex/_generated/dataModel";
-import { Check } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 function formatDate(timestamp: number): string {
@@ -23,16 +23,26 @@ function formatCurrency(cents: number): string {
 
 export default function BriefingCard({
   briefing,
-  featured = false,
+  expanded,
+  onSelect,
 }: {
   briefing: Doc<"briefings">;
-  featured?: boolean;
+  expanded: boolean;
+  onSelect: () => void;
 }) {
   return (
-    <div className="bg-pop rounded-lg p-1.5">
+    <div
+      className={`bg-pop rounded-lg p-1.5 transition-all ${
+        !expanded ? "cursor-pointer hover:bg-pop/80" : ""
+      }`}
+      onClick={!expanded ? onSelect : undefined}
+    >
       <div className="bg-card rounded overflow-hidden">
         <div className="flex items-center justify-between px-5 py-3 border-b border-border">
           <div className="flex items-center gap-3">
+            {!expanded && (
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            )}
             <span className="text-sm font-medium text-foreground">
               {formatDate(briefing.date)}
             </span>
@@ -49,8 +59,8 @@ export default function BriefingCard({
             <span>{briefing.metrics.agingClaimsCount} aging</span>
           </div>
         </div>
-        <div className={`px-5 py-5 ${featured ? "" : "max-h-32 overflow-hidden relative"}`}>
-          <div className="prose-dark text-[15px] leading-relaxed">
+        <div className={`px-5 py-5 ${expanded ? "" : "max-h-24 overflow-hidden relative"}`}>
+          <div className="text-[15px] leading-relaxed">
             <ReactMarkdown
               components={{
                 h1: ({ children }) => (
@@ -86,7 +96,7 @@ export default function BriefingCard({
               {briefing.content}
             </ReactMarkdown>
           </div>
-          {!featured && (
+          {!expanded && (
             <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card to-transparent" />
           )}
         </div>
