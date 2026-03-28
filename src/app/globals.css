@@ -145,17 +145,11 @@
   }
 }
 
-@media (min-width: 1028px) and (max-width: 1239px) {
-  html { font-size: 0.7em; }
-}
-@media (min-width: 1240px) and (max-width: 1919px) {
-  html { font-size: 0.75em; }
-}
 @media (min-width: 1920px) {
   html { font-size: 1em; }
 }
 @media (min-width: 2160px) {
-  html { font-size: 1.2em; }
+  html { font-size: 1.1em; }
 }
 
 ::-webkit-scrollbar { width: 6px; }
