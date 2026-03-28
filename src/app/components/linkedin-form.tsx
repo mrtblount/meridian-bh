@@ -3,6 +3,7 @@
 import { useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function LinkedinForm() {
   const generateDraft = useAction(
@@ -30,42 +31,38 @@ export default function LinkedinForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white rounded-xl border border-zinc-100 p-6"
-    >
-      <label className="block text-sm font-medium text-zinc-700 mb-2">
-        What topic should we write about?
-      </label>
-      <div className="flex gap-3">
-        <input
-          type="text"
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder='e.g., "anxiety in teens", "building referral partnerships"'
-          maxLength={500}
-          className="flex-1 px-4 py-2.5 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-400 placeholder:text-zinc-300 bg-white"
-          disabled={isGenerating}
-        />
-        <button
-          type="submit"
-          disabled={isGenerating || !topic.trim()}
-          className="px-5 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
-        >
-          {isGenerating ? (
-            <>
-              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              Generating...
-            </>
-          ) : (
-            "Generate Draft"
-          )}
-        </button>
+    <form onSubmit={handleSubmit} className="bg-pop rounded-lg p-1.5">
+      <div className="bg-card rounded p-4">
+        <label className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">
+          Topic
+        </label>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder='e.g., "anxiety in teens", "building referral partnerships"'
+            maxLength={500}
+            className="flex-1 px-3 py-2.5 bg-transparent border border-input rounded-md text-sm text-foreground font-mono placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-primary"
+            disabled={isGenerating}
+          />
+          <button
+            type="submit"
+            disabled={isGenerating || !topic.trim()}
+            className="px-5 py-2.5 bg-primary text-primary-foreground rounded-md text-sm font-bold uppercase tracking-wide hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              "Generate Draft"
+            )}
+          </button>
+        </div>
+        {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
       </div>
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
     </form>
   );
 }

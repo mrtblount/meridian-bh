@@ -2,26 +2,34 @@
 
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import NumberFlow from "@number-flow/react";
 
 const DAY = 24 * 60 * 60 * 1000;
 
 const typeLabels: Record<string, string> = {
   pcp: "PCP",
   er: "ER",
-  social_worker: "Social Worker",
-  school_counselor: "School",
-  therapist: "Therapist",
-  other: "Other",
+  social_worker: "SW",
+  school_counselor: "SC",
+  therapist: "TH",
+  other: "OT",
 };
 
-const typeDotColors: Record<string, string> = {
-  pcp: "bg-blue-500",
-  er: "bg-red-500",
-  social_worker: "bg-purple-500",
-  school_counselor: "bg-amber-500",
-  therapist: "bg-teal-500",
-  other: "bg-zinc-400",
-};
+const chartColors = [
+  "bg-chart-1",
+  "bg-chart-2",
+  "bg-chart-3",
+  "bg-chart-4",
+  "bg-chart-5",
+];
+
+const bulletColors = [
+  "bg-chart-1",
+  "bg-chart-2",
+  "bg-chart-3",
+  "bg-chart-4",
+  "bg-chart-5",
+];
 
 export default function SourceLeaderboard() {
   const leaderboard = useQuery(api.queries.referrals.getSourceLeaderboard, {
@@ -35,59 +43,79 @@ export default function SourceLeaderboard() {
   const totalReferrals = leaderboard.reduce((sum, s) => sum + s.count, 0);
 
   return (
-    <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
-      <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-zinc-900">
-          Top Sources
-        </h3>
-        <span className="text-xs text-zinc-400">90 days</span>
-      </div>
-
-      <div className="px-6 py-4 border-b border-zinc-100">
-        <div className="text-3xl font-semibold tracking-tight text-zinc-900">
-          {totalReferrals}
+    <div className="bg-pop rounded-lg p-1.5">
+      <div className="bg-card rounded overflow-hidden">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            Top Sources
+          </h3>
+          <span className="text-xs text-muted-foreground font-mono">90d</span>
         </div>
-        <p className="text-xs text-zinc-400 mt-0.5">total referrals</p>
-        <div className="flex gap-0.5 mt-3 h-2 rounded-full overflow-hidden bg-zinc-100">
-          {leaderboard.slice(0, 5).map((source) => {
-            const pct = totalReferrals > 0 ? (source.count / totalReferrals) * 100 : 0;
+
+        {/* Big number + progress bar */}
+        <div className="px-4 py-4 border-b border-border">
+          <div className="font-display text-4xl tracking-tight text-foreground">
+            <NumberFlow value={totalReferrals} />
+          </div>
+          <p className="text-xs text-muted-foreground mt-1 uppercase">total referrals</p>
+          <div className="flex gap-0.5 mt-3 h-2 rounded-sm overflow-hidden bg-muted">
+            {leaderboard.slice(0, 5).map((source, i) => {
+              const pct = totalReferrals > 0 ? (source.count / totalReferrals) * 100 : 0;
+              return (
+                <div
+                  key={source._id}
+                  className={`${chartColors[i % chartColors.length]} rounded-sm`}
+                  style={{ width: `${pct}%` }}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Source list */}
+        <div className="max-h-[400px] overflow-y-auto">
+          {leaderboard.map((source, i) => {
+            const isCold = coldSourceIds.has(source._id);
+            const pct = totalReferrals > 0 ? Math.round((source.count / totalReferrals) * 100) : 0;
+
             return (
               <div
                 key={source._id}
-                className={`${typeDotColors[source.type]} rounded-full`}
-                style={{ width: `${pct}%` }}
-              />
+                className={`flex items-center px-4 py-2.5 gap-3 border-b border-border/50 ${
+                  isCold ? "bg-destructive/5" : ""
+                }`}
+              >
+                {/* Bullet indicator - square, not circle */}
+                <span
+                  className={`w-2.5 h-2.5 rounded-[1.5px] shrink-0 ${
+                    bulletColors[i % bulletColors.length]
+                  }`}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-medium text-foreground truncate font-mono">
+                      {source.name}
+                    </span>
+                    {isCold && (
+                      <span className="text-[10px] font-bold uppercase text-destructive bg-destructive/10 border border-destructive px-1.5 py-0.5 rounded">
+                        Cold
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground uppercase">
+                    {typeLabels[source.type]}
+                  </span>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-sm font-bold text-foreground font-display">{pct}%</span>
+                  <span className="block text-xs text-muted-foreground font-mono">
+                    {source.count}
+                  </span>
+                </div>
+              </div>
             );
           })}
         </div>
-      </div>
-
-      <div className="divide-y divide-zinc-50 max-h-[400px] overflow-y-auto">
-        {leaderboard.map((source) => {
-          const isCold = coldSourceIds.has(source._id);
-          const pct = totalReferrals > 0 ? Math.round((source.count / totalReferrals) * 100) : 0;
-
-          return (
-            <div key={source._id} className="flex items-center px-6 py-3 gap-3">
-              <span className={`w-2 h-2 rounded-full shrink-0 ${typeDotColors[source.type]}`} />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-medium text-zinc-800 truncate">
-                    {source.name}
-                  </span>
-                  {isCold && (
-                    <span className="text-[10px] text-red-500 font-medium">COLD</span>
-                  )}
-                </div>
-                <span className="text-xs text-zinc-400">{typeLabels[source.type]}</span>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="text-sm font-semibold text-zinc-900">{pct}%</span>
-                <span className="block text-xs text-zinc-400">{source.count} referral{source.count !== 1 ? "s" : ""}</span>
-              </div>
-            </div>
-          );
-        })}
       </div>
     </div>
   );

@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "./providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-rebels",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const robotoMono = Roboto_Mono({
+  variable: "--font-roboto-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Meridian Behavioral Health — Dashboard",
+  title: "Meridian BH",
   description: "AI-powered automation suite for behavioral health practices",
 };
 
@@ -26,9 +26,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`dark ${spaceGrotesk.variable} ${robotoMono.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body>
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>
     </html>
