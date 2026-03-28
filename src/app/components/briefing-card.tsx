@@ -27,8 +27,8 @@ export default function BriefingCard({
   featured?: boolean;
 }) {
   return (
-    <div className={`bg-white rounded-xl border border-zinc-100 overflow-hidden ${featured ? "" : ""}`}>
-      <div className="flex items-center justify-between px-6 py-3 border-b border-zinc-100">
+    <div className={`bg-white rounded-2xl border border-zinc-200/60 overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]`}>
+      <div className="flex items-center justify-between px-6 py-3 border-b border-zinc-200/60">
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-zinc-700">
             {formatDate(briefing.date)}
